@@ -19,3 +19,5 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 dependencies {
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
 }
+
+eclipse.project.name = "gdx-vfx-lib-core"

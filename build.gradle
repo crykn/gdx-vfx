@@ -28,6 +28,7 @@ buildscript {
 }
 
 apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'eclipse'
 
 // Setup Nexus repo credentials.
 // They usually defined in user global gradle.properties file.
@@ -81,3 +82,5 @@ task uploadSnapshotArchivesAll(dependsOn: ['gdx-vfx:core:uploadSnapshotArchives'
                                      'gdx-vfx:effects:uploadSnapshotArchives',
                                      'gdx-vfx:gwt:uploadSnapshotArchives']) {
 }
+
+eclipse.project.name = "gdx-vfx"

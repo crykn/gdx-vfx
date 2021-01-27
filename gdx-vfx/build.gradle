@@ -109,3 +109,7 @@ subprojects {
         dependsOn 'uploadArchives'
     }
 }
+
+apply plugin: 'eclipse'
+
+eclipse.project.name = "gdx-vfx-lib"

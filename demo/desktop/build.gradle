@@ -68,3 +68,5 @@ task generateDtd(dependsOn: classes, type: JavaExec) {
     workingDir = project.rootDir
     ignoreExitValue = true
 }
+
+eclipse.project.name = appName + "-desktop"

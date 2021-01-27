@@ -30,19 +30,23 @@ buildscript {
     }
 }
 
+apply plugin: 'eclipse'
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
     version = '1.0'
-    ext.appName = 'gdx-vfx'
+    ext.appName = 'gdx-vfx-demo'
 }
 
-configure(subprojects - project(':demo:android')) {
-    apply plugin: 'java'
-    sourceCompatibility = 1.7
+//configure(subprojects - project(':demo:android')) {
+//    apply plugin: 'java'
+//    sourceCompatibility = 1.7
+//
+//    compileJava.options.encoding = 'UTF-8'
+//
+//    sourceSets.main.java.srcDirs = ['src']
+//}
 
-    compileJava.options.encoding = 'UTF-8'
-
-    sourceSets.main.java.srcDirs = ['src']
-}
+eclipse.project.name = "gdx-vfx-demo"

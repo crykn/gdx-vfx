@@ -21,3 +21,5 @@ dependencies {
     implementation project(":gdx-vfx:core")
     implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 }
+
+eclipse.project.name = "gdx-vfx-lib-html"

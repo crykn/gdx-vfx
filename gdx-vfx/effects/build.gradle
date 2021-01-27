@@ -27,3 +27,5 @@ jar {
         include '**/*'
     }
 }
+
+eclipse.project.name = "gdx-vfx-lib-effects"
