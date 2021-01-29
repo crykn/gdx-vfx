@@ -2,7 +2,7 @@
 
 [![](https://jitpack.io/v/crykn/gdx-vfx.svg)](https://jitpack.io/#crykn/gdx-vfx) [![Build Status](https://travis-ci.com/crykn/gdx-vfx.svg?branch=master)](https://travis-ci.com/crykn/gdx-vfx)
 
-**This is a fork of [gdx-vfx](https://github.com/crashinvaders/gdx-vfx), a flexible post-processing library for libGDX. The main changes in this fork are: **
+**This is a fork of [gdx-vfx](https://github.com/crashinvaders/gdx-vfx), a flexible post-processing library for libGDX. The main changes in this fork are:**
 
 - An update to libGDX 1.9.13
 - Support for OpenGL 3 on macOS
