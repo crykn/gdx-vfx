@@ -19,7 +19,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 dependencies {
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
     
-    implementation "com.github.crykn.guacamole:gdx:$guacamoleVersion"
+    api  "com.github.crykn.guacamole:gdx:$guacamoleVersion" // is exposed because of NestableFrameBuffer
 }
 
 eclipse.project.name = "gdx-vfx-lib-core"

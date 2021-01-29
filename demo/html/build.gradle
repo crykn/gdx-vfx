@@ -18,7 +18,9 @@ apply plugin: 'java'
 apply plugin: "gwt"
 apply plugin: "war"
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs += ['../assets']
 
@@ -39,7 +41,7 @@ gwt {
 }
 
 dependencies {
-    implementation project(":demo:core")
+    implementation project(':demo:core')
     implementation project(":gdx-vfx:gwt")
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
     implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"

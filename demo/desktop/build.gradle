@@ -16,6 +16,9 @@
 
 apply plugin: 'java'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 ext.mainClassName = "com.crashinvaders.vfx.demo.desktop.DesktopLauncher"
 ext.assetsDir = new File("../assets")
 
