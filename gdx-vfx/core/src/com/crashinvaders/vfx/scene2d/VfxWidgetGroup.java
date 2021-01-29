@@ -16,48 +16,51 @@
 
 package com.crashinvaders.vfx.scene2d;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.crashinvaders.vfx.VfxManager;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
+import com.crashinvaders.vfx.effects.VfxEffect;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 /**
- * A widget group that manages {@link VfxManager} internally and applies the effects to the child actors.
+ * A widget group that manages {@link VfxManager} internally and applies the
+ * effects to the child actors.
  * <p>
- * The group renders all the children into internal {@link VfxFrameBuffer},
- * pass it to the {@link VfxManager} instance for processing and then renders the result to the screen.
+ * All the internal VFX related instances are managed by the widget itself and
+ * should not be disposed or resized manually. However you're still responsible
+ * for all the {@link VfxEffect effects}' lifecycle and shall dispose them as
+ * usual.
  * <p>
- * All the internal VFX related instances are managed by the widget itself and should not be disposed or resized manually.
- * However you're still responsible for all the {@link com.crashinvaders.vfx.effects.VfxEffect effects}' lifecyle and shall dispose them as usual.
- * <p>
- * While working with VFX effects within {@link Stage} actor hierarchy keep in mind
- * that not every effect made to support transparency and there might be issues.
+ * While working with VFX effects within {@link Stage}'s actor hierarchy, keep
+ * in mind that not every effect is made to support transparency, so there might
+ * be issues.
  */
 public class VfxWidgetGroup extends WidgetGroup {
 
     private final VfxManager vfxManager;
-    private final CustomRendererAdapter rendererAdapter;
     private boolean initialized = false;
     private boolean resizePending = false;
 
-    /** If true, the internal {@link VfxManager} will be resized to match {@link VfxWidgetGroup}'s size.
-     * Means framebuffer pixels will correspond to the virtual units of stage's viewport. */
+    /**
+     * If true, the internal {@link VfxManager} will be resized to match
+     * {@link VfxWidgetGroup}'s size. Means framebuffer pixels will correspond
+     * to the virtual units of stage's viewport.
+     */
     private boolean matchWidgetSize = false;
 
-    /** Whether internal {@link VfxManager} instance should be updated
-     * with {@link com.badlogic.gdx.scenes.scene2d.Actor#act(float)} calls. */
+    /**
+     * Whether internal {@link VfxManager} instance should be updated with
+     * {@link com.badlogic.gdx.scenes.scene2d.Actor#act(float)} calls.
+     */
     private boolean updateManager = true;
 
-    public VfxWidgetGroup(Pixmap.Format pixelFormat) {
-        vfxManager = new VfxManager(pixelFormat);
-        rendererAdapter = new CustomRendererAdapter();
+    public VfxWidgetGroup() {
+        vfxManager = new VfxManager();
         super.setTransform(false);
     }
 
@@ -72,7 +75,8 @@ public class VfxWidgetGroup extends WidgetGroup {
 
     /** @see #matchWidgetSize */
     public void setMatchWidgetSize(boolean matchWidgetSize) {
-        if (this.matchWidgetSize == matchWidgetSize) return;
+        if (this.matchWidgetSize == matchWidgetSize)
+            return;
 
         this.matchWidgetSize = matchWidgetSize;
         resizePending = true;
@@ -119,22 +123,15 @@ public class VfxWidgetGroup extends WidgetGroup {
     public void draw(Batch batch, float parentAlpha) {
         validate();
 
-//        //TODO Check if there are any active effects before start capturing/processing.
-//        if (!vfxManager.anyEnabledEffects()) {
-//            this.drawChildren(batch, parentAlpha);
-//            return;
-//        }
-
-        VfxFrameBuffer captureBuffer = vfxManager.getResultBuffer();
+        NestableFrameBuffer captureBuffer = vfxManager.getResultBuffer();
 
         batch.end();
 
         performPendingResize();
 
-        vfxManager.cleanUpBuffers();
+        vfxManager.clear();
 
-        captureBuffer.addRenderer(rendererAdapter);
-        vfxManager.beginInputCapture();
+        vfxManager.beginCapture();
 
         batch.begin();
 
@@ -143,19 +140,17 @@ public class VfxWidgetGroup extends WidgetGroup {
 
         batch.end();
 
-        vfxManager.endInputCapture();
-        captureBuffer.removeRenderer(rendererAdapter);
+        vfxManager.endCapture();
 
         vfxManager.applyEffects();
 
         batch.begin();
 
         // Render result to the screen.
-        Color color = getColor();
-        batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
-        batch.draw(vfxManager.getResultBuffer().getFbo().getColorBufferTexture(),
-                getX(), getY(), getWidth(), getHeight(),
-                0f, 0f, 1f, 1f);
+        batch.setColor(getColor().r, getColor().g, getColor().b,
+                getColor().a * parentAlpha);
+        batch.draw(vfxManager.getResultBuffer().getColorBufferTexture(), getX(),
+                getY(), getWidth(), getHeight(), 0f, 0f, 1f, 1f);
     }
 
     @Override
@@ -163,7 +158,8 @@ public class VfxWidgetGroup extends WidgetGroup {
         boolean capturing = vfxManager.isCapturing();
 
         if (capturing) {
-            // Imitate "transform" child drawing for when capturing into VfxManager.
+            // Imitate "transform" child drawing for when capturing into
+            // VfxManager.
             super.setTransform(true);
         }
         if (!capturing) {
@@ -183,50 +179,57 @@ public class VfxWidgetGroup extends WidgetGroup {
         }
     }
 
-    /** VfxWidgetGroup doesn't support culling area. Any calls to it will be ignored. */
+    /**
+     * VfxWidgetGroup doesn't support culling area. Any calls to it will be
+     * ignored.
+     */
     @Deprecated
     @Override
     public void setCullingArea(Rectangle cullingArea) {
-//        throw new UnsupportedOperationException("VfxWidgetGroup doesn't support culling area.");
+        throw new UnsupportedOperationException(
+                "VfxWidgetGroup doesn't support culling area.");
     }
 
-    /** VfxWidgetGroup doesn't support transform. Any calls to the method be ignored. */
+    /**
+     * VfxWidgetGroup doesn't support transform. Any calls to the method be
+     * ignored.
+     */
     @Deprecated
     @Override
     public void setTransform(boolean transform) {
-//        throw new UnsupportedOperationException("VfxWidgetGroup doesn't support transform.");
+        throw new UnsupportedOperationException(
+                "VfxWidgetGroup doesn't support transform.");
     }
 
     private void initialize() {
-        if (initialized) return;
+        if (initialized)
+            return;
 
         performPendingResize();
-
-        rendererAdapter.initialize(getStage().getBatch());
 
         resizePending = false;
         initialized = true;
     }
 
     private void reset() {
-        if (!initialized) return;
+        if (!initialized)
+            return;
 
         vfxManager.dispose();
-
-        rendererAdapter.reset();
 
         resizePending = false;
         initialized = false;
     }
 
     private void performPendingResize() {
-        if (!resizePending) return;
+        if (!resizePending)
+            return;
 
         final int width;
         final int height;
 
         // Size may be zero if the widget wasn't laid out yet.
-        if ((int)getWidth() == 0 || (int)getHeight() == 0) {
+        if ((int) getWidth() == 0 || (int) getHeight() == 0) {
             // If the size of the widget is not defined,
             // just resize to a small buffer to keep the memory footprint low.
             width = 16;
@@ -243,8 +246,6 @@ public class VfxWidgetGroup extends WidgetGroup {
             float ppu = viewport.getScreenWidth() / viewport.getWorldWidth();
             width = MathUtils.floor(getWidth() * ppu);
             height = MathUtils.floor(getHeight() * ppu);
-
-            rendererAdapter.updateOwnProjection();
         }
 
         vfxManager.resize(width, height);
@@ -252,43 +253,4 @@ public class VfxWidgetGroup extends WidgetGroup {
         resizePending = false;
     }
 
-    private class CustomRendererAdapter implements VfxFrameBuffer.Renderer {
-        private final Matrix4 preservedProjection = new Matrix4();
-        private final Matrix4 ownProjection = new Matrix4();
-
-        private Batch batch;
-
-        public void initialize(Batch batch) {
-            this.batch = batch;
-        }
-
-        private void reset() {
-            batch = null;
-        }
-
-        @Override
-        public void flush() {
-            batch.flush();
-        }
-
-        @Override
-        public void assignLocalMatrices(Matrix4 projection, Matrix4 transform) {
-            preservedProjection.set(batch.getProjectionMatrix());
-
-            if (!matchWidgetSize) {
-                projection = ownProjection;
-            }
-
-            batch.setProjectionMatrix(projection);
-        }
-
-        @Override
-        public void restoreOwnMatrices() {
-            batch.setProjectionMatrix(preservedProjection);
-        }
-
-        public void updateOwnProjection() {
-            ownProjection.setToOrtho2D(0f, 0f, getWidth(), getHeight());
-        }
-    }
 }

@@ -21,8 +21,9 @@ import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.effects.ChainVfxEffect;
 import com.crashinvaders.vfx.effects.ShaderVfxEffect;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 public class CopyEffect extends ShaderVfxEffect implements ChainVfxEffect {
 
@@ -46,9 +47,10 @@ public class CopyEffect extends ShaderVfxEffect implements ChainVfxEffect {
         render(context, buffers.getSrcBuffer(), buffers.getDstBuffer());
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src, VfxFrameBuffer dst) {
+    public void render(VfxRenderContext context, NestableFrameBuffer src,
+            NestableFrameBuffer dst) {
         // Bind src buffer's texture as a primary one.
-        src.getTexture().bind(TEXTURE_HANDLE0);
+        src.getColorBufferTexture().bind(TEXTURE_HANDLE0);
         // Apply shader effect.
         renderShader(context, dst);
     }

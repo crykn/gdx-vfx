@@ -16,26 +16,28 @@
 
 package com.crashinvaders.vfx;
 
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
 import com.crashinvaders.vfx.framebuffer.VfxFrameBufferPool;
 import com.crashinvaders.vfx.framebuffer.VfxFrameBufferRenderer;
-import com.crashinvaders.vfx.utils.ViewportQuadMesh;
 
 public class VfxRenderContext implements Disposable {
 
     private final VfxFrameBufferPool bufferPool;
     private final VfxFrameBufferRenderer bufferRenderer;
-    private final Pixmap.Format pixelFormat;
 
     private int bufferWidth;
     private int bufferHeight;
 
-    public VfxRenderContext(Pixmap.Format pixelFormat, int bufferWidth, int bufferHeight) {
-        this.bufferPool = new VfxFrameBufferPool(pixelFormat, bufferWidth, bufferHeight, 8);
+    public VfxRenderContext(int bufferWidth, int bufferHeight,
+            boolean hasDepth) {
+        this.bufferPool = new VfxFrameBufferPool(Format.RGBA8888, bufferWidth,
+                bufferHeight, hasDepth, 4, Texture.TextureWrap.ClampToEdge,
+                Texture.TextureWrap.ClampToEdge, Texture.TextureFilter.Nearest,
+                Texture.TextureFilter.Nearest);
         this.bufferRenderer = new VfxFrameBufferRenderer();
-        this.pixelFormat = pixelFormat;
         this.bufferWidth = bufferWidth;
         this.bufferHeight = bufferHeight;
     }
@@ -56,19 +58,11 @@ public class VfxRenderContext implements Disposable {
         return bufferPool;
     }
 
-    public void rebind() {
-        bufferRenderer.rebind();
-    }
-
-    public Pixmap.Format getPixelFormat() {
-        return pixelFormat;
-    }
-
     public VfxFrameBufferRenderer getBufferRenderer() {
         return bufferRenderer;
     }
 
-    public ViewportQuadMesh getViewportMesh() {
+    public Mesh getViewportMesh() {
         return bufferRenderer.getMesh();
     }
 

@@ -19,10 +19,12 @@ package com.crashinvaders.vfx.effects;
 import com.badlogic.gdx.Gdx;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
 
-public class VignettingEffect extends ShaderVfxEffect implements ChainVfxEffect {
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
+
+public class VignettingEffect extends ShaderVfxEffect
+        implements ChainVfxEffect {
 
     private static final String TEXTURE0 = "u_texture0";
     private static final String VIGNETTE_INTENSITY = "u_vignetteIntensity";
@@ -32,7 +34,6 @@ public class VignettingEffect extends ShaderVfxEffect implements ChainVfxEffect 
     private static final String CENTER_Y = "u_centerY";
     private static final String SATURATION = "u_saturation";
     private static final String SATURATION_MUL = "u_saturationMul";
-
 
     private float vignetteX = 0.8f;
     private float vignetteY = 0.25f;
@@ -76,9 +77,10 @@ public class VignettingEffect extends ShaderVfxEffect implements ChainVfxEffect 
         render(context, buffers.getSrcBuffer(), buffers.getDstBuffer());
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src, VfxFrameBuffer dst) {
+    public void render(VfxRenderContext context, NestableFrameBuffer src,
+            NestableFrameBuffer dst) {
         // Bind src buffer's texture as a primary one.
-        src.getTexture().bind(TEXTURE_HANDLE0);
+        src.getColorBufferTexture().bind(TEXTURE_HANDLE0);
         // Apply shader effect and render result to dst buffer.
         renderShader(context, dst);
     }

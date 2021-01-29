@@ -16,13 +16,13 @@
 
 package com.crashinvaders.vfx.utils;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Pool;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Pool;
 
 public class PrioritizedArray<T> implements Iterable<T> {
 
@@ -84,10 +84,15 @@ public class PrioritizedArray<T> implements Iterable<T> {
         items.sort(comparator);
     }
 
-    /** Returns an iterator for the items in the array. Remove is supported. Note that the same iterator instance is returned each
-     * time this method is called. Use the {@link Array.ArrayIterator} constructor for nested or multithreaded iteration. */
-    public Iterator<T> iterator () {
-        if (iterable == null) iterable = new PrioritizedArrayIterable<T>(this);
+    /**
+     * Returns an iterator for the items in the array. Remove is supported. Note
+     * that the same iterator instance is returned each time this method is
+     * called. Use the {@link Array.ArrayIterator} constructor for nested or
+     * multithreaded iteration.
+     */
+    public Iterator<T> iterator() {
+        if (iterable == null)
+            iterable = new PrioritizedArrayIterable<T>(this);
         return iterable.iterator();
     }
 
@@ -129,55 +134,67 @@ public class PrioritizedArray<T> implements Iterable<T> {
         }
     }
 
-    private static class WrapperComparator<T> implements Comparator<Wrapper<T>> {
+    private static class WrapperComparator<T>
+            implements Comparator<Wrapper<T>> {
         @Override
         public int compare(Wrapper l, Wrapper r) {
-            return CommonUtils.compare(l.priority, r.priority);
+            return (l.priority < r.priority) ? -1
+                    : ((l.priority == r.priority) ? 0 : 1); // replicates
+                                                            // Integer.compare()
+                                                            // to
+                                                            // support Android
+                                                            // API < 19
         }
     }
 
-    //region Iterator implementation
-    public static class PrioritizedArrayIterator<T> implements Iterator<T>, Iterable<T> {
+    // region Iterator implementation
+    public static class PrioritizedArrayIterator<T>
+            implements Iterator<T>, Iterable<T> {
         private final PrioritizedArray<T> array;
         private final boolean allowRemove;
         int index;
         boolean valid = true;
 
-        public PrioritizedArrayIterator (PrioritizedArray<T> array) {
+        public PrioritizedArrayIterator(PrioritizedArray<T> array) {
             this(array, true);
         }
 
-        public PrioritizedArrayIterator (PrioritizedArray<T> array, boolean allowRemove) {
+        public PrioritizedArrayIterator(PrioritizedArray<T> array,
+                boolean allowRemove) {
             this.array = array;
             this.allowRemove = allowRemove;
         }
 
-        public boolean hasNext () {
+        public boolean hasNext() {
             if (!valid) {
-                throw new GdxRuntimeException("#iterator() cannot be used nested.");
+                throw new GdxRuntimeException(
+                        "#iterator() cannot be used nested.");
             }
             return index < array.size();
         }
 
-        public T next () {
-            if (index >= array.size()) throw new NoSuchElementException(String.valueOf(index));
+        public T next() {
+            if (index >= array.size())
+                throw new NoSuchElementException(String.valueOf(index));
             if (!valid) {
-                throw new GdxRuntimeException("#iterator() cannot be used nested.");
+                throw new GdxRuntimeException(
+                        "#iterator() cannot be used nested.");
             }
             return array.items.getValueAt(index++).item;
         }
 
-        public void remove () {
-            if (!allowRemove) throw new GdxRuntimeException("Remove not allowed.");
+        public void remove() {
+            if (!allowRemove)
+                throw new GdxRuntimeException("Remove not allowed.");
             index--;
             array.remove(index);
         }
 
-        public void reset () {
+        public void reset() {
             index = 0;
         }
 
-        public Iterator<T> iterator () {
+        public Iterator<T> iterator() {
             return this;
         }
     }
@@ -185,18 +202,20 @@ public class PrioritizedArray<T> implements Iterable<T> {
     public static class PrioritizedArrayIterable<T> implements Iterable<T> {
         private final PrioritizedArray<T> array;
         private final boolean allowRemove;
-        private PrioritizedArray.PrioritizedArrayIterator<T> iterator1, iterator2;
+        private PrioritizedArray.PrioritizedArrayIterator<T> iterator1,
+                iterator2;
 
-        public PrioritizedArrayIterable (PrioritizedArray<T> array) {
+        public PrioritizedArrayIterable(PrioritizedArray<T> array) {
             this(array, true);
         }
 
-        public PrioritizedArrayIterable (PrioritizedArray<T> array, boolean allowRemove) {
+        public PrioritizedArrayIterable(PrioritizedArray<T> array,
+                boolean allowRemove) {
             this.array = array;
             this.allowRemove = allowRemove;
         }
 
-        public Iterator<T> iterator () {
+        public Iterator<T> iterator() {
             if (iterator1 == null) {
                 iterator1 = new PrioritizedArrayIterator<T>(array, allowRemove);
                 iterator2 = new PrioritizedArrayIterator<T>(array, allowRemove);
@@ -213,5 +232,5 @@ public class PrioritizedArray<T> implements Iterable<T> {
             return iterator2;
         }
     }
-    //endregion
+    // endregion
 }

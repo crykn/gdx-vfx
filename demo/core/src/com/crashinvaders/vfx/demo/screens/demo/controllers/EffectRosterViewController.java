@@ -17,7 +17,6 @@
 package com.crashinvaders.vfx.demo.screens.demo.controllers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -26,12 +25,29 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.Disposable;
+import com.crashinvaders.vfx.VfxManager;
 import com.crashinvaders.vfx.common.lml.CommonLmlParser;
 import com.crashinvaders.vfx.common.lml.LmlUtils;
 import com.crashinvaders.vfx.common.viewcontroller.LmlViewController;
 import com.crashinvaders.vfx.common.viewcontroller.ViewControllerManager;
-import com.crashinvaders.vfx.VfxManager;
-import com.crashinvaders.vfx.effects.*;
+import com.crashinvaders.vfx.effects.BloomEffect;
+import com.crashinvaders.vfx.effects.ChainVfxEffect;
+import com.crashinvaders.vfx.effects.ChromaticAberrationEffect;
+import com.crashinvaders.vfx.effects.CrtEffect;
+import com.crashinvaders.vfx.effects.FilmGrainEffect;
+import com.crashinvaders.vfx.effects.FisheyeEffect;
+import com.crashinvaders.vfx.effects.FxaaEffect;
+import com.crashinvaders.vfx.effects.GaussianBlurEffect;
+import com.crashinvaders.vfx.effects.LensFlareEffect;
+import com.crashinvaders.vfx.effects.LevelsEffect;
+import com.crashinvaders.vfx.effects.MotionBlurEffect;
+import com.crashinvaders.vfx.effects.NfaaEffect;
+import com.crashinvaders.vfx.effects.OldTvEffect;
+import com.crashinvaders.vfx.effects.RadialBlurEffect;
+import com.crashinvaders.vfx.effects.RadialDistortionEffect;
+import com.crashinvaders.vfx.effects.VignettingEffect;
+import com.crashinvaders.vfx.effects.WaterDistortionEffect;
+import com.crashinvaders.vfx.effects.ZoomEffect;
 import com.crashinvaders.vfx.effects.util.CopyEffect;
 import com.crashinvaders.vfx.effects.util.GammaThresholdEffect;
 import com.crashinvaders.vfx.effects.util.MixEffect;
@@ -124,12 +140,12 @@ public class EffectRosterViewController extends LmlViewController {
         }
         // Motion Blur (MIX)
         {
-            MotionBlurEffect filter = new MotionBlurEffect(Pixmap.Format.RGBA8888, MixEffect.Method.MIX, 0.75f);
+            MotionBlurEffect filter = new MotionBlurEffect(MixEffect.Method.MIX, 0.75f);
             effectsRoster.add(new EffectEntryModel("Motion Blur (MIX)", filter));
         }
         // Motion Blur (MAX)
         {
-            MotionBlurEffect filter = new MotionBlurEffect(Pixmap.Format.RGBA8888, MixEffect.Method.MAX, 0.75f);
+            MotionBlurEffect filter = new MotionBlurEffect(MixEffect.Method.MAX, 0.75f);
             effectsRoster.add(new EffectEntryModel("Motion Blur (MAX)", filter));
         }
         // Old TV

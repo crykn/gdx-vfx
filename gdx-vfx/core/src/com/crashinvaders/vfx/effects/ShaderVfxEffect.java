@@ -17,13 +17,15 @@
 package com.crashinvaders.vfx.effects;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.crashinvaders.vfx.VfxRenderContext;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 /** Base class for any shader based single-pass filter. */
 @SuppressWarnings("unchecked")
@@ -68,126 +70,144 @@ public abstract class ShaderVfxEffect extends AbstractVfxEffect {
         return program;
     }
 
-    protected void renderShader(VfxRenderContext context, VfxFrameBuffer dst) {
-        boolean manualBufferBind = !dst.isDrawing();
-        if (manualBufferBind) { dst.begin(); }
+    protected void renderShader(VfxRenderContext context,
+            NestableFrameBuffer dst) {
+        boolean manualBufferBind = !dst.isBound();
+        if (manualBufferBind) {
+            dst.begin();
+        }
 
-        program.begin();
-        context.getViewportMesh().render(program);
-        program.end();
+        program.bind();
+        context.getViewportMesh().render(program, GL20.GL_TRIANGLE_STRIP);
 
-        if (manualBufferBind) { dst.end(); }
+        if (manualBufferBind) {
+            dst.end();
+        }
     }
 
     /**
      * Updates shader's uniform of float type.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
      */
     protected void setUniform(String uniformName, float value) {
-        program.begin();
+        program.bind();
         program.setUniformf(uniformName, value);
-        program.end();
     }
 
     /**
      * Updates shader's uniform of int type.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
      */
     protected void setUniform(String uniformName, int value) {
-        program.begin();
+        program.bind();
         program.setUniformi(uniformName, value);
-        program.end();
     }
 
     /**
      * Updates shader's uniform of vec2 type.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
      */
     protected void setUniform(String uniformName, Vector2 value) {
-        program.begin();
+        program.bind();
         program.setUniformf(uniformName, value);
-        program.end();
     }
 
     /**
      * Updates shader's uniform of vec3 type.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
      */
     protected void setUniform(String uniformName, Vector3 value) {
-        program.begin();
+        program.bind();
         program.setUniformf(uniformName, value);
-        program.end();
     }
 
     /**
      * Updates shader's uniform of vec4 type.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
      */
     protected void setUniform(String uniformName, Color value) {
-        program.begin();
+        program.bind();
         program.setUniformf(uniformName, value);
-        program.end();
     }
 
     /**
      * Updates shader's uniform of mat3 type.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
      */
     protected void setUniform(String uniformName, Matrix3 value) {
-        program.begin();
+        program.bind();
         program.setUniformMatrix(uniformName, value);
-        program.end();
     }
 
     /**
      * Updates shader's uniform of mat4 type.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
      */
     protected void setUniform(String uniformName, Matrix4 value) {
-        program.begin();
+        program.bind();
         program.setUniformMatrix(uniformName, value);
-        program.end();
     }
 
     /**
      * Updates shader's uniform array.
      * <p/>
-     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader program internally on every call.
-     * If you need to update multiple uniforms, please consider calling methods directly from {@link ShaderProgram}.
-     * @param elementSize Defines the type of the uniform array: float[], vec2[], vec3[] or vec4[].
-     * Expected value is within the range of [1..4] (inclusively). */
-    protected void setUniform(String uniformName, int elementSize, float[] values, int offset, int length) {
-        program.begin();
+     * <b>NOTE:</b> This is an utility method that will bind/unbind the shader
+     * program internally on every call. If you need to update multiple
+     * uniforms, please consider calling methods directly from
+     * {@link ShaderProgram}.
+     * 
+     * @param elementSize
+     *            Defines the type of the uniform array: float[], vec2[], vec3[]
+     *            or vec4[]. Expected value is within the range of [1..4]
+     *            (inclusively).
+     */
+    protected void setUniform(String uniformName, int elementSize,
+            float[] values, int offset, int length) {
+        program.bind();
         switch (elementSize) {
-            case 1:
-                program.setUniform1fv(uniformName, values, offset, length);
-                break;
-            case 2:
-                program.setUniform2fv(uniformName, values, offset, length);
-                break;
-            case 3:
-                program.setUniform3fv(uniformName, values, offset, length);
-                break;
-            case 4:
-                program.setUniform4fv(uniformName, values, offset, length);
-                break;
-            default:
-                throw new IllegalArgumentException("elementSize has illegal value: " + elementSize + ". Possible values are 1..4");
+        case 1:
+            program.setUniform1fv(uniformName, values, offset, length);
+            break;
+        case 2:
+            program.setUniform2fv(uniformName, values, offset, length);
+            break;
+        case 3:
+            program.setUniform3fv(uniformName, values, offset, length);
+            break;
+        case 4:
+            program.setUniform4fv(uniformName, values, offset, length);
+            break;
+        default:
+            throw new IllegalArgumentException("elementSize has illegal value: "
+                    + elementSize + ". Possible values are 1..4");
         }
-        program.end();
     }
 }

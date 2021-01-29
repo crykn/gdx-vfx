@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Almost like regular ArrayMap, but supports value sorting and access to values by indices.
+ * Almost like regular ArrayMap, but supports value sorting and access to values
+ * by indices.
  */
 public class ValueArrayMap<K, V> {
     private final Map<K, V> map;

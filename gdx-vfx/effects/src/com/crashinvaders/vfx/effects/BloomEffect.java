@@ -25,8 +25,9 @@ import com.crashinvaders.vfx.effects.util.CombineEffect;
 import com.crashinvaders.vfx.effects.util.CopyEffect;
 import com.crashinvaders.vfx.effects.util.GammaThresholdEffect;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 public class BloomEffect extends CompositeVfxEffect implements ChainVfxEffect {
 
@@ -45,7 +46,8 @@ public class BloomEffect extends CompositeVfxEffect implements ChainVfxEffect {
     public BloomEffect(Settings settings) {
         copy = register(new CopyEffect());
         blur = register(new GaussianBlurEffect());
-        threshold = register(new GammaThresholdEffect(GammaThresholdEffect.Type.RGBA));
+        threshold = register(
+                new GammaThresholdEffect(GammaThresholdEffect.Type.RGBA));
         combine = register(new CombineEffect());
 
         applySettings(settings);
@@ -54,7 +56,7 @@ public class BloomEffect extends CompositeVfxEffect implements ChainVfxEffect {
     @Override
     public void render(VfxRenderContext context, VfxPingPongWrapper buffers) {
         // Preserve the input buffer data.
-        VfxFrameBuffer origSrc = context.getBufferPool().obtain();
+        NestableFrameBuffer origSrc = context.getBufferPool().obtain();
         copy.render(context, buffers.getSrcBuffer(), origSrc);
 
         boolean blendingWasEnabled = VfxGLUtils.isGLEnabled(GL20.GL_BLEND);
@@ -74,12 +76,15 @@ public class BloomEffect extends CompositeVfxEffect implements ChainVfxEffect {
         }
 
         if (blending) {
-            // TODO support for Gdx.gl.glBlendFuncSeparate(sfactor, dfactor, GL20.GL_ONE, GL20.GL_ONE );
+            // TODO support for Gdx.gl.glBlendFuncSeparate(sfactor, dfactor,
+            // GL20.GL_ONE,
+            // GL20.GL_ONE );
             Gdx.gl.glBlendFunc(sfactor, dfactor);
         }
 
         // Mix original scene and blurred result).
-        combine.render(context, origSrc, buffers.getSrcBuffer(), buffers.getDstBuffer());
+        combine.render(context, origSrc, buffers.getSrcBuffer(),
+                buffers.getDstBuffer());
 
         context.getBufferPool().free(origSrc);
     }
@@ -198,15 +203,17 @@ public class BloomEffect extends CompositeVfxEffect implements ChainVfxEffect {
         public final float baseIntensity;
         public final float baseSaturation;
 
-        public Settings(int blurPasses, float bloomThreshold, float baseIntensity, float baseSaturation,
-                        float bloomIntensity, float bloomSaturation) {
-            this(BlurType.Gaussian5x5b, blurPasses, 0, bloomThreshold, baseIntensity, baseSaturation,
-                    bloomIntensity,
+        public Settings(int blurPasses, float bloomThreshold,
+                float baseIntensity, float baseSaturation, float bloomIntensity,
+                float bloomSaturation) {
+            this(BlurType.Gaussian5x5b, blurPasses, 0, bloomThreshold,
+                    baseIntensity, baseSaturation, bloomIntensity,
                     bloomSaturation);
         }
 
-        public Settings(BlurType blurType, int blurPasses, float blurAmount, float bloomThreshold,
-                        float baseIntensity, float baseSaturation, float bloomIntensity, float bloomSaturation) {
+        public Settings(BlurType blurType, int blurPasses, float blurAmount,
+                float bloomThreshold, float baseIntensity, float baseSaturation,
+                float bloomIntensity, float bloomSaturation) {
             this.blurType = blurType;
             this.blurPasses = blurPasses;
             this.blurAmount = blurAmount;

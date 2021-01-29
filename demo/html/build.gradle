@@ -96,7 +96,6 @@ task addSource {
     doLast {
         sourceSets.main.compileClasspath += files(project(':gdx-vfx:core').sourceSets.main.allJava.srcDirs)
         sourceSets.main.compileClasspath += files(project(':gdx-vfx:effects').sourceSets.main.allJava.srcDirs)
-        sourceSets.main.compileClasspath += files(project(':gdx-vfx:gwt').sourceSets.main.allJava.srcDirs)
         sourceSets.main.compileClasspath += files(project(':demo:core').sourceSets.main.allJava.srcDirs)
     }
 }

@@ -37,11 +37,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 /**
  * Lens flare effect.
+ * 
  * @author Toni Sagrista
  **/
 public class LensFlareEffect extends ShaderVfxEffect implements ChainVfxEffect {
@@ -88,9 +90,10 @@ public class LensFlareEffect extends ShaderVfxEffect implements ChainVfxEffect {
         render(context, buffers.getSrcBuffer(), buffers.getDstBuffer());
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src, VfxFrameBuffer dst) {
+    public void render(VfxRenderContext context, NestableFrameBuffer src,
+            NestableFrameBuffer dst) {
         // Bind src buffer's texture as a primary one.
-        src.getTexture().bind(TEXTURE_HANDLE0);
+        src.getColorBufferTexture().bind(TEXTURE_HANDLE0);
         // Apply shader effect and render result to dst buffer.
         renderShader(context, dst);
     }
@@ -103,9 +106,14 @@ public class LensFlareEffect extends ShaderVfxEffect implements ChainVfxEffect {
         setLightPosition(lightPosition.x, lightPosition.y);
     }
 
-    /** Sets the light position in screen normalized coordinates [0..1].
-     * @param x Light position x screen coordinate,
-     * @param y Light position y screen coordinate. */
+    /**
+     * Sets the light position in screen normalized coordinates [0..1].
+     * 
+     * @param x
+     *            Light position x screen coordinate,
+     * @param y
+     *            Light position y screen coordinate.
+     */
     public void setLightPosition(float x, float y) {
         lightPosition.set(x, y);
         setUniform(U_LIGHT_POSITION, lightPosition);

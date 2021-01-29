@@ -19,7 +19,10 @@ package com.crashinvaders.vfx.effects;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
 
-public class MultipassEffectWrapper extends AbstractVfxEffect implements ChainVfxEffect {
+import de.damios.guacamole.Preconditions;
+
+public class MultipassEffectWrapper extends AbstractVfxEffect
+        implements ChainVfxEffect {
 
     private final ChainVfxEffect effect;
     private int passes = 1;
@@ -70,9 +73,8 @@ public class MultipassEffectWrapper extends AbstractVfxEffect implements ChainVf
     }
 
     public void setPasses(int passes) {
-        if (passes < 0) {
-            throw new IllegalArgumentException("Passes value cannot be a negative number.");
-        }
+        Preconditions.checkArgument(passes >= 0, "Passes cannot be < 0.");
+
         this.passes = passes;
     }
 }

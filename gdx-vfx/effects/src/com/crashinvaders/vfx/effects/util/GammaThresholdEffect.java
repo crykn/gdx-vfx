@@ -21,11 +21,13 @@ import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.effects.ChainVfxEffect;
 import com.crashinvaders.vfx.effects.ShaderVfxEffect;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
 
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
+
 /** Keeps only values brighter than the specified gamma. */
-public class GammaThresholdEffect extends ShaderVfxEffect implements ChainVfxEffect {
+public class GammaThresholdEffect extends ShaderVfxEffect
+        implements ChainVfxEffect {
 
     private static final String U_TEXTURE0 = "u_texture0";
     private static final String U_THRESHOLD = "u_threshold";
@@ -35,8 +37,8 @@ public class GammaThresholdEffect extends ShaderVfxEffect implements ChainVfxEff
 
     public GammaThresholdEffect(Type type) {
         super(VfxGLUtils.compileShader(
-        		Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"),
-				Gdx.files.classpath("gdxvfx/shaders/gamma-threshold.frag"),
+                Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"),
+                Gdx.files.classpath("gdxvfx/shaders/gamma-threshold.frag"),
                 "#define THRESHOLD_TYPE " + type.name()));
         rebind();
     }
@@ -56,9 +58,10 @@ public class GammaThresholdEffect extends ShaderVfxEffect implements ChainVfxEff
         render(context, buffers.getSrcBuffer(), buffers.getDstBuffer());
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src, VfxFrameBuffer dst) {
+    public void render(VfxRenderContext context, NestableFrameBuffer src,
+            NestableFrameBuffer dst) {
         // Bind src buffer's texture as a primary one.
-        src.getTexture().bind(TEXTURE_HANDLE0);
+        src.getColorBufferTexture().bind(TEXTURE_HANDLE0);
         // Apply shader effect and render result to dst buffer.
         renderShader(context, dst);
     }
@@ -74,8 +77,6 @@ public class GammaThresholdEffect extends ShaderVfxEffect implements ChainVfxEff
     }
 
     public enum Type {
-        RGBA,
-        RGB,
-        ALPHA_PREMULTIPLIED,
+        RGBA, RGB, ALPHA_PREMULTIPLIED,
     }
 }

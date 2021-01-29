@@ -20,16 +20,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.effects.ShaderVfxEffect;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 /**
  * Simply mixes two frames with a factor of {@link #mixFactor}.
  * <p>
- * Depends on {@link Method} the result will be combined with either:
- * <br><code>max(src0, src1 * mixFactor)</code>
- * <br> or
- * <br><code>mix(src0, src1, mixFactor)</code>
+ * Depends on {@link Method} the result will be combined with either: <br>
+ * <code>max(src0, src1 * mixFactor)</code> <br>
+ * or <br>
+ * <code>mix(src0, src1, mixFactor)</code>
  */
 public class MixEffect extends ShaderVfxEffect {
 
@@ -50,16 +51,16 @@ public class MixEffect extends ShaderVfxEffect {
     @Override
     public void rebind() {
         super.rebind();
-        program.begin();
+        program.bind();
         program.setUniformi(U_TEXTURE0, TEXTURE_HANDLE0);
         program.setUniformi(U_TEXTURE1, TEXTURE_HANDLE1);
         program.setUniformf(U_MIX, mixFactor);
-        program.end();
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src0, VfxFrameBuffer src1, VfxFrameBuffer dst) {
-        src0.getTexture().bind(TEXTURE_HANDLE0);
-        src1.getTexture().bind(TEXTURE_HANDLE1);
+    public void render(VfxRenderContext context, NestableFrameBuffer src0,
+            NestableFrameBuffer src1, NestableFrameBuffer dst) {
+        src0.getColorBufferTexture().bind(TEXTURE_HANDLE0);
+        src1.getColorBufferTexture().bind(TEXTURE_HANDLE1);
         renderShader(context, dst);
     }
 
@@ -74,7 +75,6 @@ public class MixEffect extends ShaderVfxEffect {
 
     /** Defines which function will be used to combine mix the two frames. */
     public enum Method {
-        MAX,
-        MIX;
+        MAX, MIX;
     }
 }

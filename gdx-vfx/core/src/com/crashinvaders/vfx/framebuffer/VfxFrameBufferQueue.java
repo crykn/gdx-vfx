@@ -16,30 +16,40 @@
 
 package com.crashinvaders.vfx.framebuffer;
 
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
+import de.damios.guacamole.Preconditions;
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
+
 /**
- * Provides looped access to an array of {@link VfxFrameBuffer}.
+ * Provides looped access to an array of {@link NestableFrameBuffer}s.
  */
 public class VfxFrameBufferQueue implements Disposable {
-    private final Array<VfxFrameBuffer> buffers;
+    private final Array<NestableFrameBuffer> buffers;
     private int currentIdx = 0;
 
-    private Texture.TextureWrap wrapU = Texture.TextureWrap.ClampToEdge;
-    private Texture.TextureWrap wrapV = Texture.TextureWrap.ClampToEdge;
-    private Texture.TextureFilter filterMin = Texture.TextureFilter.Nearest;
-    private Texture.TextureFilter filterMag = Texture.TextureFilter.Nearest;
+    private boolean depth;
+    private TextureWrap wrapU = TextureWrap.ClampToEdge;
+    private TextureWrap wrapV = Texture.TextureWrap.ClampToEdge;
+    private TextureFilter filterMin = TextureFilter.Nearest;
+    private TextureFilter filterMag = TextureFilter.Nearest;
 
-    public VfxFrameBufferQueue(Pixmap.Format pixelFormat, int fboAmount) {
-        if (fboAmount < 1) {
-            throw new IllegalArgumentException("FBO amount should be a positive number.");
-        }
-        buffers = new Array<>(true, fboAmount);
-        for (int i = 0; i < fboAmount; i++) {
-            buffers.add(new VfxFrameBuffer(pixelFormat));
+    public VfxFrameBufferQueue(int width, int height, boolean depth,
+            int fboCount) {
+        Preconditions.checkArgument(fboCount >= 1,
+                "The number of fbos needs to be at least 1");
+
+        this.depth = depth;
+
+        buffers = new Array<>(true, fboCount);
+        for (int i = 0; i < fboCount; i++) {
+            buffers.add(new NestableFrameBuffer(Format.RGBA8888, width, height,
+                    depth));
         }
     }
 
@@ -52,36 +62,44 @@ public class VfxFrameBufferQueue implements Disposable {
     }
 
     public void resize(int width, int height) {
-        for (int i = 0; i < buffers.size; i++) {
-            buffers.get(i).initialize(width, height);
+        int amount = buffers.size;
+
+        for (int i = 0; i < amount; i++) {
+            buffers.get(i).dispose();
+        }
+        buffers.clear();
+
+        for (int i = 0; i < amount; i++) {
+            buffers.add(new NestableFrameBuffer(Format.RGBA8888, width, height,
+                    depth));
         }
     }
 
     /**
-     * Restores buffer OpenGL parameters. Could be useful in case of OpenGL context loss.
+     * Restores buffer OpenGL parameters. Could be useful in case of OpenGL
+     * context loss.
      */
     public void rebind() {
         for (int i = 0; i < buffers.size; i++) {
-            VfxFrameBuffer wrapper = buffers.get(i);
-            // FBOs might be null if the instance wasn't initialized with #resize(int, int) yet.
-            if (wrapper.getFbo() == null) continue;
+            NestableFrameBuffer fbo = buffers.get(i);
 
-            Texture texture = wrapper.getFbo().getColorBufferTexture();
+            Texture texture = fbo.getColorBufferTexture();
             texture.setWrap(wrapU, wrapV);
             texture.setFilter(filterMin, filterMag);
         }
     }
 
-    public VfxFrameBuffer getCurrent() {
+    public NestableFrameBuffer getCurrent() {
         return buffers.get(currentIdx);
     }
 
-    public VfxFrameBuffer changeToNext() {
+    public NestableFrameBuffer changeToNext() {
         currentIdx = (currentIdx + 1) % buffers.size;
         return getCurrent();
     }
 
-    public void setTextureParams(Texture.TextureWrap u, Texture.TextureWrap v, Texture.TextureFilter min, Texture.TextureFilter mag) {
+    public void setTextureParams(Texture.TextureWrap u, Texture.TextureWrap v,
+            Texture.TextureFilter min, Texture.TextureFilter mag) {
         wrapU = u;
         wrapV = v;
         filterMin = min;

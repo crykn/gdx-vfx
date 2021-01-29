@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.crashinvaders.vfx.VfxManager;
 import com.crashinvaders.vfx.effects.GaussianBlurEffect;
@@ -19,9 +18,9 @@ public class VfxExample extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
 
         // VfxManager is a host for the effects.
-        // It captures rendering into internal off-screen buffer and applies a chain of defined effects.
-        // Off-screen buffers may have any pixel format, for this example we will use RGBA8888.
-        vfxManager = new VfxManager(Pixmap.Format.RGBA8888);
+        // It captures rendering into internal off-screen buffer and applies a
+        // chain of defined effects.
+        vfxManager = new VfxManager();
 
         // Create and add an effect.
         // VfxEffect derivative classes serve as controllers for the effects.
@@ -33,7 +32,8 @@ public class VfxExample extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         // VfxManager manages internal off-screen buffers,
-        // which should always match the required viewport (whole screen in our case).
+        // which should always match the required viewport (whole screen in our
+        // case).
         vfxManager.resize(width, height);
 
         shapeRenderer.getProjectionMatrix().setToOrtho2D(0f, 0f, width, height);
@@ -46,11 +46,12 @@ public class VfxExample extends ApplicationAdapter {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Clean up internal buffers, as we don't need any information from the last render.
-        vfxManager.cleanUpBuffers();
+        // Clean up internal buffers, as we don't need any information from the
+        // last render.
+        vfxManager.clear();
 
         // Begin render to an off-screen buffer.
-        vfxManager.beginInputCapture();
+        vfxManager.beginCapture();
 
         // Here's where game render should happen.
         // For demonstration purposes we just render some simple geometry.
@@ -62,7 +63,7 @@ public class VfxExample extends ApplicationAdapter {
         shapeRenderer.end();
 
         // End render to an off-screen buffer.
-        vfxManager.endInputCapture();
+        vfxManager.endCapture();
 
         // Apply the effects chain to the captured frame.
         // In our case, only one effect (gaussian blur) will be applied.
@@ -75,7 +76,8 @@ public class VfxExample extends ApplicationAdapter {
     @Override
     public void dispose() {
         // Since VfxManager has internal frame buffers,
-        // it implements Disposable interface and thus should be utilized properly.
+        // it implements Disposable interface and thus should be utilized
+        // properly.
         vfxManager.dispose();
 
         // *** PLEASE NOTE ***

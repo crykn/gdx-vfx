@@ -1,16 +1,20 @@
-![Logo](https://i.imgur.com/kVBGQHx.png)
+![gdx-vfx Logo](https://i.imgur.com/kVBGQHx.png)
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.crashinvaders.vfx/gdx-vfx-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.crashinvaders.vfx%22%20AND%20a:%22gdx-vfx-core%22)
-[![Build Status](https://travis-ci.org/crashinvaders/gdx-vfx.svg?branch=master)](https://travis-ci.org/crashinvaders/gdx-vfx)
+[![](https://jitpack.io/v/crykn/gdx-vfx.svg)](https://jitpack.io/#crykn/gdx-vfx)
+[![Build Status](https://travis-ci.org/crykn/gdx-vfx.svg?branch=master)](https://travis-ci.org/crykn/gdx-vfx)
 
-Flexible post-processing shader visual effects for LibGDX. The library is based on [libgdx-contribs-postprocessing](https://github.com/manuelbua/libgdx-contribs/tree/master/postprocessing), with lots of improvements and heavy refactoring.
-The goal is to focus on stability, offer lightweight integration and provide simple effect implementation mechanism.
+This is a fork of [gdx-vfx](https://github.com/crashinvaders/gdx-vfx), a flexible post-processing library for libGDX. The main changes in this fork are:
 
-The library is in Beta, the code is poorly documented. Some goodies might be missing and more cool stuff is to be implemented soon.
+- Updates to libGDX 1.9.13
+- Supports OpenGL 3 on macOS
+- Adds support for depth
+- Uses `NestableFrameBuffer`s from [guacamole](https://github.com/crykn/guacamole) instead of `VfxFrameBuffer`s; removes the coupled `Renderer`s
+- `beginInputCapture()` -> `beginCapture()`, `endInputCapture()` -> `endCapture()`, `cleanUpBuffers()` -> `clear()`, `anyEnabledEffects()` -> `hasEffects()` 
+- Heavily refactors a lot of the internal classes in the library
+
+Gdx-vfx itself is based on [libgdx-contribs-postprocessing](https://github.com/manuelbua/libgdx-contribs/tree/master/postprocessing), with lots of improvements and heavy refactoring. The goal is to focus on stability, offer lightweight integration and provide a simple mechanism to implement effects.
 
 Read more about the library at the [wiki introduction page](https://github.com/crashinvaders/gdx-vfx/wiki/Library-overview).
-
-All the major changes are listed in the [CHANGES.md](https://github.com/crashinvaders/gdx-vfx/blob/master/CHANGES.md) file.
 
 # Demo
 
@@ -23,20 +27,20 @@ cd gdx-vfx
 ./gradlew demo:desktop:run
 ```
 
-![Alt Text](https://imgur.com/dCsVhoo.gif)
+![Demo GIF](https://imgur.com/dCsVhoo.gif)
 
 # How to use
 
 ### 1. Add the library to the project
 
-#### Maven dependency
-The library's stable releases are available through maven central repo.
+#### Gradle dependency
+The library's releases are available through Jitpack.
 
 Add it in your root `build.gradle` at the end of repositories:
 ```gradle
 allprojects {
     repositories {
-        mavenCentral()
+        maven { url "https://jitpack.io" }
     }
 }
 ```
@@ -44,23 +48,19 @@ allprojects {
 Add the dependency:
 ```gradle
 dependencies {
-    implementation 'com.crashinvaders.vfx:gdx-vfx-core:0.5.0'
-    implementation 'com.crashinvaders.vfx:gdx-vfx-effects:0.5.0'    // Optional, if you need standard filter/effects.
+    implementation "com.github.crykn.gdx-vfx:gdx-vfx-core:$vfxVersion"
+    implementation "com.github.crykn.gdx-vfx:gdx-vfx-effects:$vfxVersion"    // Optional, if you need standard filter/effects.
 }
 ```
 
 #### HTML/GWT support
-The library is fully HTML/GWT compatible, but requires extra dependency to be included to GWT module in order to work properly.  
-Please consider reading [GWT integration guide](https://github.com/crashinvaders/gdx-vfx/wiki/GWT-HTML-Library-Integration).
+The library is fully HTML/GWT compatible, but requires an extra dependency to be included in the GWT module in order to work properly.  
+Please take a look at the [GWT integration guide](https://github.com/crashinvaders/gdx-vfx/wiki/GWT-HTML-Library-Integration).
 ```gradle
 dependencies {
-    implementation 'com.crashinvaders.vfx:gdx-vfx-gwt:0.5.0'
+    implementation "com.github.crykn.gdx-vfx:gdx-vfx-gwt:$vfxVersion"
 }
 ```
-
-#### Other integration options
-There are number of ways to incorporate the library into the project. 
-If you're looking for snapshot version artifacts or another approach, please read the [general integration guide](https://github.com/crashinvaders/gdx-vfx/wiki/General-Library-Integration).
 
 ### 2. Sample code
 
@@ -87,8 +87,7 @@ public class VfxExample extends ApplicationAdapter {
 
         // VfxManager is a host for the effects.
         // It captures rendering into internal off-screen buffer and applies a chain of defined effects.
-        // Off-screen buffers may have any pixel format, for this example we will use RGBA8888.
-        vfxManager = new VfxManager(Pixmap.Format.RGBA8888);
+        vfxManager = new VfxManager();
 
         // Create and add an effect.
         // VfxEffect derivative classes serve as controllers for the effects.
@@ -114,10 +113,10 @@ public class VfxExample extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Clean up internal buffers, as we don't need any information from the last render.
-        vfxManager.cleanUpBuffers();
+        vfxManager.clear();
 
         // Begin render to an off-screen buffer.
-        vfxManager.beginInputCapture();
+        vfxManager.beginCapture();
 
         // Here's where game render should happen.
         // For demonstration purposes we just render some simple geometry.
@@ -129,7 +128,7 @@ public class VfxExample extends ApplicationAdapter {
         shapeRenderer.end();
 
         // End render to an off-screen buffer.
-        vfxManager.endInputCapture();
+        vfxManager.endCapture();
 
         // Apply the effects chain to the captured frame.
         // In our case, only one effect (gaussian blur) will be applied.

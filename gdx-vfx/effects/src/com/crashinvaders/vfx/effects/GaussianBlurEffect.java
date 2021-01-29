@@ -19,14 +19,15 @@ package com.crashinvaders.vfx.effects;
 import com.badlogic.gdx.Gdx;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
 
-public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEffect {
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
+
+public class GaussianBlurEffect extends AbstractVfxEffect
+        implements ChainVfxEffect {
 
     private enum Tap {
-        Tap3x3(1),
-        Tap5x5(2),
+        Tap3x3(1), Tap5x5(2),
         // Tap7x7(3),
         ;
 
@@ -38,10 +39,10 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
     }
 
     public enum BlurType {
-        Gaussian3x3(Tap.Tap3x3),
-        Gaussian3x3b(Tap.Tap3x3), // R=5 (11x11, policy "higher-then-discard")
-        Gaussian5x5(Tap.Tap5x5),
-        Gaussian5x5b(Tap.Tap5x5), // R=9 (19x19, policy "higher-then-discard")
+        Gaussian3x3(Tap.Tap3x3), Gaussian3x3b(Tap.Tap3x3), // R=5 (11x11, policy
+                                                           // "higher-then-discard")
+        Gaussian5x5(Tap.Tap5x5), Gaussian5x5b(Tap.Tap5x5), // R=9 (19x19, policy
+                                                           // "higher-then-discard")
         ;
 
         public final Tap tap;
@@ -139,7 +140,9 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
     }
 
     public void setPasses(int passes) {
-        if (passes < 1) throw new IllegalArgumentException("Passes should be greater than 0.");
+        if (passes < 1)
+            throw new IllegalArgumentException(
+                    "Passes should be greater than 0.");
 
         this.passes = passes;
     }
@@ -155,93 +158,96 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
         float dy = this.invHeight;
 
         switch (this.type) {
-            case Gaussian3x3:
-            case Gaussian5x5:
-                computeKernel(this.type.tap.radius, this.amount, outWeights);
-                computeOffsets(this.type.tap.radius, this.invWidth, this.invHeight, outOffsetsH, outOffsetsV);
-                break;
+        case Gaussian3x3:
+        case Gaussian5x5:
+            computeKernel(this.type.tap.radius, this.amount, outWeights);
+            computeOffsets(this.type.tap.radius, this.invWidth, this.invHeight,
+                    outOffsetsH, outOffsetsV);
+            break;
 
-            case Gaussian3x3b:
-                // Weights and offsets are computed from a binomial distribution
-                // and reduced to be used *only* with bilinearly-filtered texture lookups
-                // with radius = 1f
+        case Gaussian3x3b:
+            // Weights and offsets are computed from a binomial distribution
+            // and reduced to be used *only* with bilinearly-filtered texture
+            // lookups
+            // with radius = 1f
 
-                // Weights
-                outWeights[0] = 0.352941f;
-                outWeights[1] = 0.294118f;
-                outWeights[2] = 0.352941f;
+            // Weights
+            outWeights[0] = 0.352941f;
+            outWeights[1] = 0.294118f;
+            outWeights[2] = 0.352941f;
 
-                // Horizontal offsets
-                outOffsetsH[0] = -1.33333f;
-                outOffsetsH[1] = 0f;
-                outOffsetsH[2] = 0f;
-                outOffsetsH[3] = 0f;
-                outOffsetsH[4] = 1.33333f;
-                outOffsetsH[5] = 0f;
+            // Horizontal offsets
+            outOffsetsH[0] = -1.33333f;
+            outOffsetsH[1] = 0f;
+            outOffsetsH[2] = 0f;
+            outOffsetsH[3] = 0f;
+            outOffsetsH[4] = 1.33333f;
+            outOffsetsH[5] = 0f;
 
-                // Vertical offsets
-                outOffsetsV[0] = 0f;
-                outOffsetsV[1] = -1.33333f;
-                outOffsetsV[2] = 0f;
-                outOffsetsV[3] = 0f;
-                outOffsetsV[4] = 0f;
-                outOffsetsV[5] = 1.33333f;
+            // Vertical offsets
+            outOffsetsV[0] = 0f;
+            outOffsetsV[1] = -1.33333f;
+            outOffsetsV[2] = 0f;
+            outOffsetsV[3] = 0f;
+            outOffsetsV[4] = 0f;
+            outOffsetsV[5] = 1.33333f;
 
-                // Scale offsets from binomial space to screen space
-                for (int i = 0; i < convolve.getLength() * 2; i++) {
-                    outOffsetsH[i] *= dx;
-                    outOffsetsV[i] *= dy;
-                }
+            // Scale offsets from binomial space to screen space
+            for (int i = 0; i < convolve.getLength() * 2; i++) {
+                outOffsetsH[i] *= dx;
+                outOffsetsV[i] *= dy;
+            }
 
-                break;
+            break;
 
-            case Gaussian5x5b:
+        case Gaussian5x5b:
 
-                // Weights and offsets are computed from a binomial distribution
-                // and reduced to be used *only* with bilinearly-filtered texture lookups
-                // with radius = 2f
+            // Weights and offsets are computed from a binomial distribution
+            // and reduced to be used *only* with bilinearly-filtered texture
+            // lookups
+            // with radius = 2f
 
-                // weights
-                outWeights[0] = 0.0702703f;
-                outWeights[1] = 0.316216f;
-                outWeights[2] = 0.227027f;
-                outWeights[3] = 0.316216f;
-                outWeights[4] = 0.0702703f;
+            // weights
+            outWeights[0] = 0.0702703f;
+            outWeights[1] = 0.316216f;
+            outWeights[2] = 0.227027f;
+            outWeights[3] = 0.316216f;
+            outWeights[4] = 0.0702703f;
 
-                // Horizontal offsets
-                outOffsetsH[0] = -3.23077f;
-                outOffsetsH[1] = 0f;
-                outOffsetsH[2] = -1.38462f;
-                outOffsetsH[3] = 0f;
-                outOffsetsH[4] = 0f;
-                outOffsetsH[5] = 0f;
-                outOffsetsH[6] = 1.38462f;
-                outOffsetsH[7] = 0f;
-                outOffsetsH[8] = 3.23077f;
-                outOffsetsH[9] = 0f;
+            // Horizontal offsets
+            outOffsetsH[0] = -3.23077f;
+            outOffsetsH[1] = 0f;
+            outOffsetsH[2] = -1.38462f;
+            outOffsetsH[3] = 0f;
+            outOffsetsH[4] = 0f;
+            outOffsetsH[5] = 0f;
+            outOffsetsH[6] = 1.38462f;
+            outOffsetsH[7] = 0f;
+            outOffsetsH[8] = 3.23077f;
+            outOffsetsH[9] = 0f;
 
-                // Vertical offsets
-                outOffsetsV[0] = 0f;
-                outOffsetsV[1] = -3.23077f;
-                outOffsetsV[2] = 0f;
-                outOffsetsV[3] = -1.38462f;
-                outOffsetsV[4] = 0f;
-                outOffsetsV[5] = 0f;
-                outOffsetsV[6] = 0f;
-                outOffsetsV[7] = 1.38462f;
-                outOffsetsV[8] = 0f;
-                outOffsetsV[9] = 3.23077f;
+            // Vertical offsets
+            outOffsetsV[0] = 0f;
+            outOffsetsV[1] = -3.23077f;
+            outOffsetsV[2] = 0f;
+            outOffsetsV[3] = -1.38462f;
+            outOffsetsV[4] = 0f;
+            outOffsetsV[5] = 0f;
+            outOffsetsV[6] = 0f;
+            outOffsetsV[7] = 1.38462f;
+            outOffsetsV[8] = 0f;
+            outOffsetsV[9] = 3.23077f;
 
-                // Scale offsets from binomial space to screen space
-                for (int i = 0; i < convolve.getLength() * 2; i++) {
-                    outOffsetsH[i] *= dx;
-                    outOffsetsV[i] *= dy;
-                }
+            // Scale offsets from binomial space to screen space
+            for (int i = 0; i < convolve.getLength() * 2; i++) {
+                outOffsetsH[i] *= dx;
+                outOffsetsV[i] *= dy;
+            }
 
-                break;
-            default:
-                hasData = false;
-                break;
+            break;
+        default:
+            hasData = false;
+            break;
         }
 
         if (hasData) {
@@ -249,7 +255,8 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
         }
     }
 
-    private void computeKernel(int blurRadius, float blurAmount, float[] outKernel) {
+    private void computeKernel(int blurRadius, float blurAmount,
+            float[] outKernel) {
         int radius = blurRadius;
 
         // float sigma = (float)radius / amount;
@@ -264,7 +271,8 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
         for (int i = -radius; i <= radius; ++i) {
             distance = i * i;
             index = i + radius;
-            outKernel[index] = (float) Math.exp(-distance / twoSigmaSquare) / sigmaRoot;
+            outKernel[index] = (float) Math.exp(-distance / twoSigmaSquare)
+                    / sigmaRoot;
             total += outKernel[index];
         }
 
@@ -274,7 +282,8 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
         }
     }
 
-    private void computeOffsets(int blurRadius, float dx, float dy, float[] outOffsetH, float[] outOffsetV) {
+    private void computeOffsets(int blurRadius, float dx, float dy,
+            float[] outOffsetH, float[] outOffsetV) {
         int radius = blurRadius;
 
         final int X = 0, Y = 1;
@@ -287,7 +296,8 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
         }
     }
 
-    public static final class Convolve1DEffect extends ShaderVfxEffect implements ChainVfxEffect {
+    public static final class Convolve1DEffect extends ShaderVfxEffect
+            implements ChainVfxEffect {
 
         private static final String U_TEXTURE = "u_texture0";
         private static final String U_SAMPLE_WEIGHTS = "u_sampleWeights";
@@ -305,7 +315,8 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
             this(length, weightsData, new float[length * 2]);
         }
 
-        public Convolve1DEffect(int length, float[] weightsData, float[] offsets) {
+        public Convolve1DEffect(int length, float[] weightsData,
+                float[] offsets) {
             super(VfxGLUtils.compileShader(
                     Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"),
                     Gdx.files.classpath("gdxvfx/shaders/convolve-1d.frag"),
@@ -319,19 +330,30 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
             super.rebind();
             program.begin();
             program.setUniformi(U_TEXTURE, TEXTURE_HANDLE0);
-            program.setUniform2fv(U_SAMPLE_OFFSETS, offsets, 0, length * 2); // LibGDX asks for number of floats, NOT number of elements.
+            program.setUniform2fv(U_SAMPLE_OFFSETS, offsets, 0, length * 2); // LibGDX
+                                                                             // asks
+                                                                             // for
+                                                                             // number
+                                                                             // of
+                                                                             // floats,
+                                                                             // NOT
+                                                                             // number
+                                                                             // of
+                                                                             // elements.
             program.setUniform1fv(U_SAMPLE_WEIGHTS, weights, 0, length);
             program.end();
         }
 
         @Override
-        public void render(VfxRenderContext context, VfxPingPongWrapper buffers) {
+        public void render(VfxRenderContext context,
+                VfxPingPongWrapper buffers) {
             render(context, buffers.getSrcBuffer(), buffers.getDstBuffer());
         }
 
-        public void render(VfxRenderContext context, VfxFrameBuffer src, VfxFrameBuffer dst) {
+        public void render(VfxRenderContext context, NestableFrameBuffer src,
+                NestableFrameBuffer dst) {
             // Bind src buffer's texture as a primary one.
-            src.getTexture().bind(TEXTURE_HANDLE0);
+            src.getColorBufferTexture().bind(TEXTURE_HANDLE0);
             // Apply shader effect.
             renderShader(context, dst);
         }
@@ -344,7 +366,8 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
     }
 
     /** Encapsulates a separable 2D convolution kernel filter. */
-    public static final class Convolve2DEffect extends CompositeVfxEffect implements ChainVfxEffect {
+    public static final class Convolve2DEffect extends CompositeVfxEffect
+            implements ChainVfxEffect {
 
         private final int radius;
         private final int length; // NxN taps filter, w/ N=length
@@ -365,7 +388,8 @@ public class GaussianBlurEffect extends AbstractVfxEffect implements ChainVfxEff
         }
 
         @Override
-        public void render(VfxRenderContext context, VfxPingPongWrapper buffers) {
+        public void render(VfxRenderContext context,
+                VfxPingPongWrapper buffers) {
             hor.render(context, buffers);
             buffers.swap();
             vert.render(context, buffers);

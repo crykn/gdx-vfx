@@ -5,5 +5,5 @@
 		<include name="**/*"/>
 	</source>
 
-	<extend-configuration-property name="gdx.reflect.include" value="com.crashinvaders.vfx.gwt.GwtVfxGlExtension" />
+	<inherits name="guacamole_gdx_gwt" />
 </module>

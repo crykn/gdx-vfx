@@ -20,11 +20,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 /**
  * Normal filtered anti-aliasing filter.
+ * 
  * @author Toni Sagrista
  * @author metaphore
  */
@@ -63,9 +65,10 @@ public class NfaaEffect extends ShaderVfxEffect implements ChainVfxEffect {
         render(context, buffers.getSrcBuffer(), buffers.getDstBuffer());
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src, VfxFrameBuffer dst) {
+    public void render(VfxRenderContext context, NestableFrameBuffer src,
+            NestableFrameBuffer dst) {
         // Bind src buffer's texture as a primary one.
-        src.getTexture().bind(TEXTURE_HANDLE0);
+        src.getColorBufferTexture().bind(TEXTURE_HANDLE0);
         // Apply shader effect and render result to dst buffer.
         renderShader(context, dst);
     }

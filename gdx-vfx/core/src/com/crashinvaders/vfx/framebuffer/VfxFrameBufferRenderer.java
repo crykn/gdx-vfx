@@ -17,53 +17,64 @@
 package com.crashinvaders.vfx.framebuffer;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Disposable;
-import com.crashinvaders.vfx.utils.ViewportQuadMesh;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
+import de.damios.guacamole.gdx.graphics.QuadMeshGenerator;
+import de.damios.guacamole.gdx.graphics.ShaderCompatibilityHelper;
 
 /**
- * Simple renderer that is capable of drawing
- * {@link VfxFrameBuffer}'s texture onto the screen or into another buffer.
+ * Simple renderer that is capable of drawing a {@link FrameBuffer}'s texture
+ * onto the screen or into another buffer.
  * <p>
- * This is a lightweight {@link com.badlogic.gdx.graphics.g2d.SpriteBatch} replacement for the library's needs.
+ * This is a lightweight {@link com.badlogic.gdx.graphics.g2d.SpriteBatch}
+ * replacement for the library's needs.
  */
 public class VfxFrameBufferRenderer implements Disposable {
 
-    private final ViewportQuadMesh mesh;
+    // @formatter:off
+    private static final String VERT_SHADER = 
+                      "#ifdef GL_ES\n" 
+                    + "    #define PRECISION mediump\n"
+                    + "    precision PRECISION float;\n" 
+                    + "#else\n"
+                    + "    #define PRECISION\n" 
+                    + "#endif\n"
+                    + "attribute vec4 a_position;\n"
+                    + "attribute vec2 a_texCoord0;\n"
+                    + "varying vec2 v_texCoords;\n" 
+                    + "void main() {\n"
+                    + "    v_texCoords = a_texCoord0;\n"
+                    + "    gl_Position = a_position;\n" 
+                    + "}";
+    private static final String FRAG_SHADER = 
+                    "#ifdef GL_ES\n" 
+                    + "    #define PRECISION mediump\n"
+                    + "    precision PRECISION float;\n" 
+                    + "#else\n"
+                    + "    #define PRECISION\n" 
+                    + "#endif\n"
+                    + "varying vec2 v_texCoords;\n"
+                    + "uniform sampler2D u_texture0;\n" 
+                    + "void main() {\n"
+                    + "    gl_FragColor = texture2D(u_texture0, v_texCoords);\n"
+                    + "}";
+    // @formatter:on
+
+    private final Mesh mesh;
     private final ShaderProgram shader;
 
     public VfxFrameBufferRenderer() {
-        mesh = new ViewportQuadMesh();
+        mesh = QuadMeshGenerator.createQuad(-1, -1, 2, 2, true);
 
-        shader = new ShaderProgram(
-                "#ifdef GL_ES\n" +
-                "    #define PRECISION mediump\n" +
-                "    precision PRECISION float;\n" +
-                "#else\n" +
-                "    #define PRECISION\n" +
-                "#endif\n" +
-                "attribute vec4 a_position;\n" +
-                "attribute vec2 a_texCoord0;\n" +
-                "varying vec2 v_texCoords;\n" +
-                "void main() {\n" +
-                "    v_texCoords = a_texCoord0;\n" +
-                "    gl_Position = a_position;\n" +
-                "}",
-                "#ifdef GL_ES\n" +
-                "    #define PRECISION mediump\n" +
-                "    precision PRECISION float;\n" +
-                "#else\n" +
-                "    #define PRECISION\n" +
-                "#endif\n" +
-                "varying vec2 v_texCoords;\n" +
-                "uniform sampler2D u_texture0;\n" +
-                "void main() {\n" +
-                "    gl_FragColor = texture2D(u_texture0, v_texCoords);\n" +
-                "}"
-        );
+        shader = ShaderCompatibilityHelper.fromString(VERT_SHADER, FRAG_SHADER);
 
-        rebind();
+        shader.bind();
+        shader.setUniformi("u_texture0", 0);
     }
 
     @Override
@@ -72,52 +83,33 @@ public class VfxFrameBufferRenderer implements Disposable {
         mesh.dispose();
     }
 
-    public void rebind() {
-        shader.begin();
-        shader.setUniformi("u_texture0", 0);
-        shader.end();
+    public void renderToScreen(NestableFrameBuffer srcBuf, int width,
+            int height) {
+        renderToScreen(srcBuf, 0, 0, width, height);
     }
 
-    public void renderToScreen(VfxFrameBuffer srcBuf) {
-        renderToScreen(srcBuf.getTexture());
-    }
-
-    public void renderToScreen(Texture srcTexture) {
-        renderToScreen(srcTexture, 0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight());
-    }
-
-    public void renderToScreen(VfxFrameBuffer srcBuf, int x, int y, int width, int height) {
-        renderToScreen(srcBuf.getTexture(), x, y, width, height);
-    }
-
-    public void renderToScreen(Texture srcTexture, int x, int y, int width, int height) {
-        srcTexture.bind(0);
+    public void renderToScreen(NestableFrameBuffer srcBuf, int x, int y,
+            int width, int height) {
+        srcBuf.getColorBufferTexture().bind(0);
 
         // Update viewport to fit the area specified.
         Gdx.graphics.getGL20().glViewport(x, y, width, height);
 
-        shader.begin();
-        mesh.render(shader);
-        shader.end();
+        shader.bind();
+        mesh.render(shader, GL20.GL_TRIANGLE_STRIP);
     }
 
-    public void renderToFbo(VfxFrameBuffer srcBuf, VfxFrameBuffer dstBuf) {
-        renderToFbo(srcBuf.getTexture(), dstBuf);
-    }
-
-    public void renderToFbo(Texture srcTexture, VfxFrameBuffer dstBuf) {
-        srcTexture.bind(0);
-
-        // Viewport will be set from VfxFrameBuffer#begin() method.
+    public void renderToFbo(NestableFrameBuffer srcBuf,
+            NestableFrameBuffer dstBuf) {
+        srcBuf.getColorBufferTexture().bind(0);
 
         dstBuf.begin();
-        shader.begin();
-        mesh.render(shader);
-        shader.end();
+        shader.bind();
+        mesh.render(shader, GL20.GL_TRIANGLE_STRIP);
         dstBuf.end();
     }
 
-    public ViewportQuadMesh getMesh() {
+    public Mesh getMesh() {
         return mesh;
     }
 }

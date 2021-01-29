@@ -16,7 +16,6 @@
 
 package com.crashinvaders.vfx.demo.screens.demo.controllers;
 
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -32,7 +31,8 @@ public class VfxViewController extends LmlViewController {
     private VfxManager vfxManager;
     private WidgetGroup canvasRoot;
 
-    public VfxViewController(ViewControllerManager viewControllers, CommonLmlParser lmlParser) {
+    public VfxViewController(ViewControllerManager viewControllers,
+            CommonLmlParser lmlParser) {
         super(viewControllers, lmlParser);
     }
 
@@ -44,12 +44,13 @@ public class VfxViewController extends LmlViewController {
         return canvasRoot;
     }
 
-    @LmlAction("createCanvas") Actor createCanvas() {
+    @LmlAction("createCanvas")
+    Actor createCanvas() {
         canvasRoot = new WidgetGroup();
         canvasRoot.setName("canvasRoot");
         canvasRoot.setFillParent(true);
 
-        VfxWidgetGroup vfxGroup = new VfxWidgetGroup(Pixmap.Format.RGBA8888);
+        VfxWidgetGroup vfxGroup = new VfxWidgetGroup();
         vfxGroup.setName("vfxGroup");
         vfxGroup.addActor(canvasRoot);
         vfxGroup.setMatchWidgetSize(true);

@@ -19,9 +19,11 @@ package com.crashinvaders.vfx.effects;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * Base class for an effect that is a composition of some other {@link VfxEffect}s.
- * The class manages contained effects and delegates the lifecycle methods to the instances
- * (e.g. {@link VfxEffect#resize(int, int)}, {@link VfxEffect#rebind()}, {@link VfxEffect#update(float)}, {@link VfxEffect#dispose()}).
+ * Base class for an effect that is a composition of some other
+ * {@link VfxEffect}s. The class manages contained effects and delegates the
+ * lifecycle methods to the instances (e.g. {@link VfxEffect#resize(int, int)},
+ * {@link VfxEffect#rebind()}, {@link VfxEffect#update(float)},
+ * {@link VfxEffect#dispose()}).
  * <p/>
  * To register an internal effect, call {@link #register(VfxEffect)}.
  */

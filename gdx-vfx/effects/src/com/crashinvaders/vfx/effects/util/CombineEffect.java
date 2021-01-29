@@ -19,14 +19,17 @@ package com.crashinvaders.vfx.effects.util;
 import com.badlogic.gdx.Gdx;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.effects.ShaderVfxEffect;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 /**
  * Merges two frames with an option to change intensity and saturation for each.
- * After applying saturation and intensity factors, the result frame is <code>src0 * (1.0 - src1)  + src1</code>.
+ * After applying saturation and intensity factors, the result frame is
+ * <code>src0 * (1.0 - src1)  + src1</code>.
  * <p>
- * If you're looking for rather straightforward way to mix two frames into one, have a look at {@link MixEffect}.
+ * If you're looking for rather straightforward way to mix two frames into one,
+ * have a look at {@link MixEffect}.
  */
 public class CombineEffect extends ShaderVfxEffect {
 
@@ -63,9 +66,10 @@ public class CombineEffect extends ShaderVfxEffect {
         program.end();
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src0, VfxFrameBuffer src1, VfxFrameBuffer dst) {
-        src0.getTexture().bind(TEXTURE_HANDLE0);
-        src1.getTexture().bind(TEXTURE_HANDLE1);
+    public void render(VfxRenderContext context, NestableFrameBuffer src0,
+            NestableFrameBuffer src1, NestableFrameBuffer dst) {
+        src0.getColorBufferTexture().bind(TEXTURE_HANDLE0);
+        src1.getColorBufferTexture().bind(TEXTURE_HANDLE1);
         renderShader(context, dst);
     }
 

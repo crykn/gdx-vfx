@@ -34,8 +34,9 @@ package com.crashinvaders.vfx.effects;
 import com.badlogic.gdx.Gdx;
 import com.crashinvaders.vfx.VfxRenderContext;
 import com.crashinvaders.vfx.framebuffer.VfxPingPongWrapper;
-import com.crashinvaders.vfx.framebuffer.VfxFrameBuffer;
 import com.crashinvaders.vfx.gl.VfxGLUtils;
+
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 /** Controls levels of brightness and contrast. */
 public class LevelsEffect extends ShaderVfxEffect implements ChainVfxEffect {
@@ -78,9 +79,10 @@ public class LevelsEffect extends ShaderVfxEffect implements ChainVfxEffect {
         render(context, buffers.getSrcBuffer(), buffers.getDstBuffer());
     }
 
-    public void render(VfxRenderContext context, VfxFrameBuffer src, VfxFrameBuffer dst) {
+    public void render(VfxRenderContext context, NestableFrameBuffer src,
+            NestableFrameBuffer dst) {
         // Bind src buffer's texture as a primary one.
-        src.getTexture().bind(TEXTURE_HANDLE0);
+        src.getColorBufferTexture().bind(TEXTURE_HANDLE0);
         // Apply shader effect and render result to dst buffer.
         renderShader(context, dst);
     }
@@ -91,7 +93,9 @@ public class LevelsEffect extends ShaderVfxEffect implements ChainVfxEffect {
 
     /**
      * Sets the contrast level
-     * @param contrast The contrast value in [0..2]
+     * 
+     * @param contrast
+     *            The contrast value in [0..2]
      */
     public void setContrast(float contrast) {
         this.contrast = contrast;
@@ -104,7 +108,9 @@ public class LevelsEffect extends ShaderVfxEffect implements ChainVfxEffect {
 
     /**
      * Sets the brightness level
-     * @param brightness The brightness value in [-1..1]
+     * 
+     * @param brightness
+     *            The brightness value in [-1..1]
      */
     public void setBrightness(float brightness) {
         this.brightness = brightness;
@@ -117,7 +123,9 @@ public class LevelsEffect extends ShaderVfxEffect implements ChainVfxEffect {
 
     /**
      * Sets the saturation
-     * @param saturation The saturation level in [0..2]
+     * 
+     * @param saturation
+     *            The saturation level in [0..2]
      */
     public void setSaturation(float saturation) {
         this.saturation = saturation;
@@ -130,7 +138,9 @@ public class LevelsEffect extends ShaderVfxEffect implements ChainVfxEffect {
 
     /**
      * Sets the hue
-     * @param hue The hue level in [0..2]
+     * 
+     * @param hue
+     *            The hue level in [0..2]
      */
     public void setHue(float hue) {
         this.hue = hue;
@@ -143,7 +153,9 @@ public class LevelsEffect extends ShaderVfxEffect implements ChainVfxEffect {
 
     /**
      * Sets the gamma correction value
-     * @param gamma Gamma value in [0..3]
+     * 
+     * @param gamma
+     *            Gamma value in [0..3]
      */
     public void setGamma(float gamma) {
         this.gamma = gamma;
