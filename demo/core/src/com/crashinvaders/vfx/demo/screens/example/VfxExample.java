@@ -64,6 +64,8 @@ public class VfxExample extends ApplicationAdapter {
 
         // End render to an off-screen buffer.
         vfxManager.endCapture();
+        
+        vfxManager.update(Gdx.graphics.getDeltaTime());
 
         // Apply the effects chain to the captured frame.
         // In our case, only one effect (gaussian blur) will be applied.

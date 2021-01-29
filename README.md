@@ -1,13 +1,12 @@
 ![gdx-vfx Logo](https://i.imgur.com/kVBGQHx.png)
 
-[![](https://jitpack.io/v/crykn/gdx-vfx.svg)](https://jitpack.io/#crykn/gdx-vfx)
-[![Build Status](https://travis-ci.com/crykn/gdx-vfx.svg?branch=master)](https://travis-ci.com/crykn/gdx-vfx)
+[![](https://jitpack.io/v/crykn/gdx-vfx.svg)](https://jitpack.io/#crykn/gdx-vfx) [![Build Status](https://travis-ci.com/crykn/gdx-vfx.svg?branch=master)](https://travis-ci.com/crykn/gdx-vfx)
 
-This is a fork of [gdx-vfx](https://github.com/crashinvaders/gdx-vfx), a flexible post-processing library for libGDX. The main changes in this fork are:
+**This is a fork of [gdx-vfx](https://github.com/crashinvaders/gdx-vfx), a flexible post-processing library for libGDX. The main changes in this fork are: **
 
-- Updates to libGDX 1.9.13
-- Supports OpenGL 3 on macOS
-- Adds support for depth
+- An update to libGDX 1.9.13
+- Support for OpenGL 3 on macOS
+- Support for depth
 - Uses `NestableFrameBuffer`s from [guacamole](https://github.com/crykn/guacamole) instead of `VfxFrameBuffer`s; removes the coupled `Renderer`s
 - `beginInputCapture()` -> `beginCapture()`, `endInputCapture()` -> `endCapture()`, `cleanUpBuffers()` -> `clear()`, `anyEnabledEffects()` -> `hasEffects()` 
 - Heavily refactors a lot of the internal classes in the library
@@ -129,6 +128,8 @@ public class VfxExample extends ApplicationAdapter {
 
         // End render to an off-screen buffer.
         vfxManager.endCapture();
+        
+        vfxManager.update(Gdx.graphics.getDeltaTime());
 
         // Apply the effects chain to the captured frame.
         // In our case, only one effect (gaussian blur) will be applied.
