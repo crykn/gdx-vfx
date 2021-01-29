@@ -1,4 +1,9 @@
-package com.badlogic.gdx.utils;
+package com.crashinvaders.vfx;
+
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Pools;
 
 /**
  * A pool of objects that can be reused to avoid allocation.

@@ -25,7 +25,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.DisposablePool;
+import com.crashinvaders.vfx.DisposablePool;
 
 import de.damios.guacamole.gdx.graphics.GLUtils;
 import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;

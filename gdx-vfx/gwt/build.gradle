@@ -21,10 +21,10 @@ dependencies {
     implementation project(":gdx-vfx:core")
     implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	
-	implementation "com.github.crykn.guacamole:core:$guacamoleVersion:sources"
-    implementation "com.github.crykn.guacamole:gdx:$guacamoleVersion:sources"
-    implementation "com.github.crykn.guacamole:gdx-gwt:$guacamoleVersion"
-    implementation "com.github.crykn.guacamole:gdx-gwt:$guacamoleVersion:sources"
+	api "com.github.crykn.guacamole:core:$guacamoleVersion:sources"
+    api "com.github.crykn.guacamole:gdx:$guacamoleVersion:sources"
+    api "com.github.crykn.guacamole:gdx-gwt:$guacamoleVersion"
+    api "com.github.crykn.guacamole:gdx-gwt:$guacamoleVersion:sources"
 }
 
 eclipse.project.name = "gdx-vfx-lib-html"
