@@ -19,6 +19,7 @@ package com.crashinvaders.vfx.framebuffer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.utils.Disposable;
 
 import de.damios.guacamole.Preconditions;
@@ -136,6 +137,17 @@ public class VfxPingPongWrapper implements Disposable {
         if (!wasCapturing) {
             end();
         }
+    }
+
+    public void resize(int width, int height) {
+        boolean hasDepth = bufSrc.hasDepth();
+        bufSrc.dispose();
+        bufSrc = new NestableFrameBuffer(Format.RGBA8888, width, height,
+                hasDepth);
+
+        bufDst.dispose();
+        bufDst = new NestableFrameBuffer(Format.RGBA8888, width, height,
+                hasDepth);
     }
 
     @Override

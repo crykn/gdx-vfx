@@ -198,13 +198,16 @@ public final class VfxManager implements Disposable {
     }
 
     public void resize(int width, int height) {
-        this.width = width;
-        this.height = height;
+        if (this.width != width || this.height != height) {
+            this.width = width;
+            this.height = height;
 
-        context.resize(width, height);
+            pingPongWrapper.resize(width, height);
+            context.resize(width, height);
 
-        for (int i = 0; i < allEffects.size; i++) {
-            allEffects.get(i).resize(width, height);
+            for (int i = 0; i < allEffects.size; i++) {
+                allEffects.get(i).resize(width, height);
+            }
         }
     }
 
