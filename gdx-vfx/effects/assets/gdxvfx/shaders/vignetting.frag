@@ -31,7 +31,8 @@ uniform float u_centerY;
 #endif
 
 void main() {
-	vec3 rgb = texture2D(u_texture0, v_texCoords).xyz;
+	vec4 tex = texture2D(u_texture0, v_texCoords);
+	vec3 rgb = tex.xyz;
 	float d = distance(v_texCoords, vec2(u_centerX, u_centerY));
 	float factor = smoothstep(u_vignetteX, u_vignetteY, d);
 	rgb = rgb * factor + rgb * (1.0 - factor) * (1.0 - u_vignetteIntensity);
@@ -40,5 +41,5 @@ void main() {
 	rgb = adjustSaturation(rgb, u_saturation) * u_saturationMul;
 #endif
 
-	gl_FragColor = vec4(rgb, 1);
+	gl_FragColor = vec4(rgb, tex.a);
 }

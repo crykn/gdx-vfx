@@ -37,5 +37,5 @@ void main() {
 	vec3 channelSplit = channelSplit(u_texture0, uv);
 	vec2 screenSpace = uv * u_resolution.xy;
 	vec3 scanline = scanline(screenSpace, channelSplit);
-	gl_FragColor = vec4(scanline, 1.0);
+	gl_FragColor = vec4(scanline, texture2D(u_texture0, uv).a);
 }

@@ -27,5 +27,5 @@ void main() {
         return;
     }
 
-    gl_FragColor = vec4(texture2D(u_texture0, uv).rgb, 1.0);
+    gl_FragColor = vec4(texture2D(u_texture0, uv));
 }

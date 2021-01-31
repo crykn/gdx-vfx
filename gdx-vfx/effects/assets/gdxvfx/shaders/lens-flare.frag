@@ -69,6 +69,7 @@ void main(void) {
 	vec2 lpos = u_lightPosition;
 	lpos.x *= u_viewport.x / u_viewport.y;
 	vec3 color = u_color * lensflare(uv, lpos);
-	color = cc(color, 0.5, 0.1) + texture2D(u_texture0, v_texCoords).rgb;
-	gl_FragColor = vec4(color, 1.0);
+	vec4 tex = texture2D(u_texture0, v_texCoords);
+	color = cc(color, 0.5, 0.1) + tex.rgb;
+	gl_FragColor = vec4(color, tex.a);
 }
