@@ -21,6 +21,7 @@ import java.util.function.Predicate;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -63,15 +64,14 @@ public final class VfxManager implements Disposable {
     private int width, height;
 
     public VfxManager() {
-        this(Gdx.graphics.getBackBufferWidth(),
-                Gdx.graphics.getBackBufferHeight(), false);
+        this(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
     }
 
-    public VfxManager(int bufferWidth, int bufferHeight, boolean hasDepth) {
-        this.width = bufferWidth;
-        this.height = bufferHeight;
+    public VfxManager(int screenWidth, int screenHeight, boolean hasDepth) {
+        this.width = screenWidth;
+        this.height = screenHeight;
 
-        this.context = new VfxRenderContext(bufferWidth, bufferHeight,
+        this.context = new VfxRenderContext(screenWidth, screenHeight,
                 hasDepth);
         this.pingPongWrapper = new VfxPingPongWrapper(
                 context.getBufferPool().obtain(),
@@ -155,7 +155,8 @@ public final class VfxManager implements Disposable {
         priorities.put(effect, priority);
         allEffects.sort((e1, e2) -> Integer.compare(priorities.get(e1, 0),
                 priorities.get(e2, 0)));
-        effect.resize(width, height);
+        effect.resize(HdpiUtils.toBackBufferX(width),
+                HdpiUtils.toBackBufferY(height));
     }
 
     /** Removes the specified effect from the effect chain. */
@@ -197,16 +198,18 @@ public final class VfxManager implements Disposable {
         pingPongWrapper.clear(color);
     }
 
-    public void resize(int width, int height) {
-        if (this.width != width || this.height != height) {
-            this.width = width;
-            this.height = height;
+    public void resize(int screenWidth, int screenHeight) {
+        if (this.width != screenWidth || this.height != screenHeight) {
+            this.width = screenWidth;
+            this.height = screenHeight;
 
-            pingPongWrapper.resize(width, height);
+            pingPongWrapper.resize(HdpiUtils.toBackBufferX(width),
+                    HdpiUtils.toBackBufferY(height));
             context.resize(width, height);
 
             for (int i = 0; i < allEffects.size; i++) {
-                allEffects.get(i).resize(width, height);
+                allEffects.get(i).resize(HdpiUtils.toBackBufferX(width),
+                        HdpiUtils.toBackBufferY(height));
             }
         }
     }

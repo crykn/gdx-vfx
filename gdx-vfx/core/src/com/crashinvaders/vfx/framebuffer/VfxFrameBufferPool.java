@@ -43,23 +43,23 @@ public class VfxFrameBufferPool extends DisposablePool<NestableFrameBuffer>
     private @Nullable TextureFilter textureFilterMin;
     private @Nullable TextureFilter textureFilterMag;
 
-    public VfxFrameBufferPool(int width, int height) {
-        this(Format.RGBA8888, width, height, false, 8);
+    public VfxFrameBufferPool(int bufferWidth, int bufferHeight) {
+        this(Format.RGBA8888, bufferWidth, bufferHeight, false, 8);
     }
 
-    public VfxFrameBufferPool(Format format, int width, int height,
+    public VfxFrameBufferPool(Format format, int bufferWidth, int bufferHeight,
             boolean hasDepth, int initialCapacity) {
-        this(format, width, height, hasDepth, initialCapacity, null, null, null,
-                null);
+        this(format, bufferWidth, bufferHeight, hasDepth, initialCapacity, null,
+                null, null, null);
     }
 
-    public VfxFrameBufferPool(Format format, int width, int height,
+    public VfxFrameBufferPool(Format format, int bufferWidth, int bufferHeight,
             boolean hasDepth, int initialCapacity, TextureWrap textureWrapU,
             TextureWrap textureWrapV, TextureFilter textureFilterMin,
             TextureFilter textureFilterMag) {
         super(initialCapacity);
-        this.width = width;
-        this.height = height;
+        this.width = bufferWidth;
+        this.height = bufferHeight;
         this.format = format;
         this.hasDepth = hasDepth;
         this.textureWrapU = textureWrapU;
@@ -93,8 +93,8 @@ public class VfxFrameBufferPool extends DisposablePool<NestableFrameBuffer>
         return fbo;
     }
 
-    public void resize(int width, int height) {
-        if (this.width != width || this.height != height) {
+    public void resize(int bufferWidth, int bufferHeight) {
+        if (this.width != bufferWidth || this.height != bufferHeight) {
             clear();
         }
     }

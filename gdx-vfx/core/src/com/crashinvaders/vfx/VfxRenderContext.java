@@ -19,6 +19,7 @@ package com.crashinvaders.vfx;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.crashinvaders.vfx.framebuffer.VfxFrameBufferPool;
 import com.crashinvaders.vfx.framebuffer.VfxFrameBufferRenderer;
@@ -31,15 +32,15 @@ public class VfxRenderContext implements Disposable {
     private int bufferWidth;
     private int bufferHeight;
 
-    public VfxRenderContext(int bufferWidth, int bufferHeight,
+    public VfxRenderContext(int screenWidth, int screenHeight,
             boolean hasDepth) {
+        this.bufferWidth = HdpiUtils.toBackBufferX(screenWidth);
+        this.bufferHeight = HdpiUtils.toBackBufferY(screenHeight);
         this.bufferPool = new VfxFrameBufferPool(Format.RGBA8888, bufferWidth,
                 bufferHeight, hasDepth, 4, Texture.TextureWrap.ClampToEdge,
                 Texture.TextureWrap.ClampToEdge, Texture.TextureFilter.Nearest,
                 Texture.TextureFilter.Nearest);
         this.bufferRenderer = new VfxFrameBufferRenderer();
-        this.bufferWidth = bufferWidth;
-        this.bufferHeight = bufferHeight;
     }
 
     @Override
@@ -48,9 +49,9 @@ public class VfxRenderContext implements Disposable {
         bufferRenderer.dispose();
     }
 
-    public void resize(int bufferWidth, int bufferHeight) {
-        this.bufferWidth = bufferWidth;
-        this.bufferHeight = bufferHeight;
+    public void resize(int screenWidth, int screenHeight) {
+        this.bufferWidth = HdpiUtils.toBackBufferX(screenWidth);
+        this.bufferHeight = HdpiUtils.toBackBufferY(screenHeight);
         this.bufferPool.resize(bufferWidth, bufferHeight);
     }
 

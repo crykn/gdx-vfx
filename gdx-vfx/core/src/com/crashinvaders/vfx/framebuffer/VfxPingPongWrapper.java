@@ -139,15 +139,15 @@ public class VfxPingPongWrapper implements Disposable {
         }
     }
 
-    public void resize(int width, int height) {
+    public void resize(int bufferWidth, int bufferHeight) {
         boolean hasDepth = bufSrc.hasDepth();
         bufSrc.dispose();
-        bufSrc = new NestableFrameBuffer(Format.RGBA8888, width, height,
-                hasDepth);
+        bufSrc = new NestableFrameBuffer(Format.RGBA8888, bufferWidth,
+                bufferHeight, hasDepth);
 
         bufDst.dispose();
-        bufDst = new NestableFrameBuffer(Format.RGBA8888, width, height,
-                hasDepth);
+        bufDst = new NestableFrameBuffer(Format.RGBA8888, bufferWidth,
+                bufferHeight, hasDepth);
     }
 
     @Override

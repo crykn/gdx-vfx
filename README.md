@@ -4,11 +4,12 @@
 
 **This is a fork of [gdx-vfx](https://github.com/crashinvaders/gdx-vfx), a flexible post-processing library for libGDX. The main changes in this fork are:**
 
-- An update to libGDX 1.9.13
-- Support for OpenGL 3 on macOS
+- An update to libGDX 1.9.14
+- Support for OpenGL 3 on macOS (shaders are automatically ported to GLSL 1.50)
 - Support for depth
 - Uses `NestableFrameBuffer`s from [guacamole](https://github.com/crykn/guacamole) instead of `VfxFrameBuffer`s; removes the coupled `Renderer`s
-- `beginInputCapture()` -> `beginCapture()`, `endInputCapture()` -> `endCapture()`, `cleanUpBuffers()` -> `clear()`, `anyEnabledEffects()` -> `hasEffects()` 
+- Improves alpha blending for the following effects: lens flare, old tv, radial distortion and vignetting
+- Renames some methods: `beginInputCapture()` -> `beginCapture()`, `endInputCapture()` -> `endCapture()`, `cleanUpBuffers()` -> `clear()`, `anyEnabledEffects()` -> `hasEffects()` 
 - Heavily refactors a lot of the internal classes in the library
 
 Gdx-vfx itself is based on [libgdx-contribs-postprocessing](https://github.com/manuelbua/libgdx-contribs/tree/master/postprocessing), with lots of improvements and heavy refactoring. The goal is to focus on stability, offer lightweight integration and provide a simple mechanism to implement effects.
@@ -157,4 +158,4 @@ public class VfxExample extends ApplicationAdapter {
 
 ![Result](https://i.imgur.com/XjBynGw.png)
 
-_The actual example code can be found [here](https://github.com/crashinvaders/gdx-vfx/blob/master/demo/core/src/com/crashinvaders/vfx/demo/screens/example/VfxExample.java)._
+_The actual example code can be found [here](https://github.com/crykn/gdx-vfx/blob/master/demo/core/src/com/crashinvaders/vfx/demo/screens/example/VfxExample.java)._
