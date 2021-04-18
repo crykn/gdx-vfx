@@ -25,12 +25,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.utils.Disposable;
-import com.crashinvaders.vfx.DisposablePool;
+import com.badlogic.gdx.utils.Pool;
 
 import de.damios.guacamole.gdx.graphics.GLUtils;
 import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
-public class VfxFrameBufferPool extends DisposablePool<NestableFrameBuffer>
+public class VfxFrameBufferPool extends Pool<NestableFrameBuffer>
         implements Disposable {
 
     private int width;
@@ -97,6 +97,11 @@ public class VfxFrameBufferPool extends DisposablePool<NestableFrameBuffer>
         if (this.width != bufferWidth || this.height != bufferHeight) {
             clear();
         }
+    }
+
+    @Override
+    protected void discard(NestableFrameBuffer obj) {
+        obj.dispose();
     }
 
     @Override
