@@ -4,7 +4,7 @@
 
 **This is a fork of [gdx-vfx](https://github.com/crashinvaders/gdx-vfx), a flexible post-processing library for libGDX. The main changes in this fork are:**
 
-- An update to libGDX 1.9.14
+- An update to libGDX 1.10.0
 - Support for OpenGL 3 on macOS (shaders are automatically ported to GLSL 1.50)
 - Support for depth
 - Uses `NestableFrameBuffer`s from [guacamole](https://github.com/crykn/guacamole) instead of `VfxFrameBuffer`s; removes the coupled `Renderer`s
